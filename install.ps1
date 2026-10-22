@@ -100,6 +100,12 @@ Say ""
 Say "Antigravity region fix - installer" 'White'
 Say "---------------------------------" 'DarkGray'
 
+if (-not (Get-Command curl.exe -ErrorAction SilentlyContinue)) {
+    Fail 'curl.exe not found (ships with Windows 10 1803+).'
+    Say 'Update Windows or run this on a newer build.' 'Yellow'
+    exit 1
+}
+
 Step '1/4 Locating Antigravity'
 $agExe = Find-Antigravity
 if (-not $agExe) {
@@ -161,6 +167,8 @@ if ($Upstream) {
 Ok "Antigravity will exit via $($chosen.Url) -> $($chosen.Ip) ($($chosen.Country))"
 if ($chosen.Country -in @('RU', 'BY')) {
     Warn 'This exit country is usually rejected by Google. Switch the VPN node to USA and re-run.'
+} elseif ($chosen.Country -notin @('US', 'CH')) {
+    Warn "Country $($chosen.Country) is not verified. If Antigravity still fails, switch the VPN node to USA."
 }
 
 Step '3/4 Installing the launcher and shortcuts'
